@@ -1,18 +1,15 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:path/path.dart' show join;
-import 'package:path_provider/path_provider.dart';
 
 // A screen that allows users to take a picture using a given camera.
 class ViewFinder extends StatefulWidget {
-  final CameraDescription camera;
+  final List<CameraDescription> cameras;
 
   const ViewFinder({
     Key key,
-    @required this.camera,
+    @required this.cameras,
   }) : super(key: key);
 
   @override
@@ -20,29 +17,39 @@ class ViewFinder extends StatefulWidget {
 }
 
 class ViewFinderState extends State<ViewFinder> {
-  CameraController _controller;
+  List<CameraController> _controllers;
   Future<void> _initializeControllerFuture;
+  int _current_controller;
 
   @override
   void initState() {
     super.initState();
     // To display the current output from the Camera,
     // create a CameraController.
-    _controller = CameraController(
-      // Get a specific camera from the list of available cameras.
-      widget.camera,
-      // Define the resolution to use.
-      ResolutionPreset.medium,
-    );
+    _controllers = [
+      CameraController(
+        // Get a specific camera from the list of available cameras.
+        widget.cameras[0],
+        // Define the resolution to use.
+        ResolutionPreset.ultraHigh,
+      ),
+      CameraController(
+        // Get a specific camera from the list of available cameras.
+        widget.cameras[1],
+        // Define the resolution to use.
+        ResolutionPreset.ultraHigh,
+      )
+    ];
+    _current_controller = 0;
 
     // Next, initialize the controller. This returns a Future.
-    _initializeControllerFuture = _controller.initialize();
+    _initializeControllerFuture = _controllers[_current_controller].initialize();
   }
 
   @override
   void dispose() {
     // Dispose of the controller when the widget is disposed.
-    _controller.dispose();
+    _controllers.forEach((controller) =>controller.dispose());
     super.dispose();
   }
 
@@ -55,7 +62,7 @@ class ViewFinderState extends State<ViewFinder> {
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.done) {
               // If the Future is complete, display the preview.
-              return CameraPreview(_controller);
+              return CameraPreview(_controllers[_current_controller]);
             } else {
               // Otherwise, display a loading indicator.
               return Center(child: CircularProgressIndicator());
@@ -63,10 +70,9 @@ class ViewFinderState extends State<ViewFinder> {
           },
         ),
         Container(
-          Row(children: <Widget>[
-            Button(),
-            Button(),
-            Button()
+          child: ButtonBar(
+            children: <Widget>[
+              Button(),
             ],
           )
         )
