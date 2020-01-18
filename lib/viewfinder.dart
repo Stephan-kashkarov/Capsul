@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:path/path.dart' show join;
+import 'package:path_provider/path_provider.dart';
 
 // A screen that allows users to take a picture using a given camera.
 class ViewFinder extends StatefulWidget {
@@ -19,7 +21,17 @@ class ViewFinder extends StatefulWidget {
 class ViewFinderState extends State<ViewFinder> {
   List<CameraController> _controllers;
   Future<void> _initializeControllerFuture;
-  int _current_controller;
+  int _currentController;
+  IconData _cameraIcon;
+
+  void initCamera() {
+    if (_currentController == 1) {
+      _cameraIcon = Icons.camera_front;
+    } else {
+      _cameraIcon = Icons.camera_rear;
+    }
+    _initializeControllerFuture = _controllers[_currentController].initialize();
+  }
 
   @override
   void initState() {
@@ -40,16 +52,16 @@ class ViewFinderState extends State<ViewFinder> {
         ResolutionPreset.ultraHigh,
       )
     ];
-    _current_controller = 0;
+    _currentController = 0;
 
     // Next, initialize the controller. This returns a Future.
-    _initializeControllerFuture = _controllers[_current_controller].initialize();
+    initCamera();
   }
 
   @override
   void dispose() {
     // Dispose of the controller when the widget is disposed.
-    _controllers.forEach((controller) =>controller.dispose());
+    _controllers.forEach((controller) => controller.dispose());
     super.dispose();
   }
 
@@ -62,7 +74,7 @@ class ViewFinderState extends State<ViewFinder> {
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.done) {
               // If the Future is complete, display the preview.
-              return CameraPreview(_controllers[_current_controller]);
+              return CameraPreview(_controllers[_currentController]);
             } else {
               // Otherwise, display a loading indicator.
               return Center(child: CircularProgressIndicator());
@@ -72,7 +84,41 @@ class ViewFinderState extends State<ViewFinder> {
         Container(
           child: ButtonBar(
             children: <Widget>[
-              Button(),
+              IconButton(
+                icon: Icon(_cameraIcon),
+                onPressed: () async {
+                  setState(() {
+                    _currentController = 1 - _currentController;
+                    initCamera();
+                  });
+                },
+              ),
+              IconButton(
+                icon: Icon(Icons.camera_alt),
+                onPressed: () async {
+                  try {
+                    // Ensure that the camera is initialized.
+                    await _initializeControllerFuture;
+
+                    // Construct the path where the image should be saved using the
+                    // pattern package.
+                    final path = join(
+                      // Store the picture in the temp directory.
+                      // Find the temp directory using the `path_provider` plugin.
+                      (await getExternalStorageDirectory()).path,
+                      'Capsul/${DateTime.now()}.png',
+                    );
+
+                    // Attempt to take a picture and log where it's been saved.
+                    await _controllers[_currentController].takePicture(path);
+
+                    // If the picture was taken, display it on a new screen.
+                  } catch (e) {
+                    // If an error occurs, log the error to the console.
+                    print(e);
+                  }
+                },
+              ),
             ],
           )
         )
