@@ -3,8 +3,6 @@ import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:gallery_saver/gallery_saver.dart';
 import 'package:path/path.dart' show join;
 import 'package:path_provider/path_provider.dart';
 
@@ -18,15 +16,15 @@ class ViewFinder extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  ViewFinderState createState() => ViewFinderState();
+  _ViewFinderState createState() => _ViewFinderState();
 }
 
-class ViewFinderState extends State<ViewFinder> {
+class _ViewFinderState extends State<ViewFinder> {
   List<CameraController> _controllers;
   Future<void> _initializeControllerFuture;
   int _currentController;
   IconData _cameraIcon;
-  File thumbnail;
+  String thumbnail;
 
   void initCamera() {
     /*
@@ -41,10 +39,6 @@ class ViewFinderState extends State<ViewFinder> {
       _cameraIcon = Icons.camera_rear;
     }
     _initializeControllerFuture = _controllers[_currentController].initialize();
-  }
-
-  void setThumbnail(String path) {
-    ImagePicker.pickImage()
   }
 
   @override
@@ -125,8 +119,9 @@ class ViewFinderState extends State<ViewFinder> {
 
                     // Attempt to take a picture and log where it's been saved.
                     await _controllers[_currentController].takePicture(path);
-                    await GallerySaver.saveImage(path, albumName: 'capsul');
-
+                    setState(() {
+                      thumbnail = path;
+                    });
                     // If the picture was taken, display it on a new screen.
                   } catch (e) {
                     // If an error occurs, log the error to the console.
@@ -135,7 +130,8 @@ class ViewFinderState extends State<ViewFinder> {
                 },
               ),
               FlatButton(
-                child: Image.file(thumbnail)
+                child: Image.file(File(thumbnail)),
+                onPressed: () => Navigator.pushNamed(context, '/gallery'),
               )
             ],
           )
