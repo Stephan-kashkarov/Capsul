@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:gallery_saver/gallery_saver.dart';
 import 'package:path/path.dart' show join;
 import 'package:path_provider/path_provider.dart';
 
@@ -23,14 +26,25 @@ class ViewFinderState extends State<ViewFinder> {
   Future<void> _initializeControllerFuture;
   int _currentController;
   IconData _cameraIcon;
+  File thumbnail;
 
   void initCamera() {
+    /*
+      Init camera function
+
+      This function initalises the given camera depending on which camera 
+      is currently selected by the widget
+    */
     if (_currentController == 1) {
       _cameraIcon = Icons.camera_front;
     } else {
       _cameraIcon = Icons.camera_rear;
     }
     _initializeControllerFuture = _controllers[_currentController].initialize();
+  }
+
+  void setThumbnail(String path) {
+    ImagePicker.pickImage()
   }
 
   @override
@@ -105,12 +119,13 @@ class ViewFinderState extends State<ViewFinder> {
                     final path = join(
                       // Store the picture in the temp directory.
                       // Find the temp directory using the `path_provider` plugin.
-                      (await getExternalStorageDirectory()).path,
-                      'Capsul/${DateTime.now()}.png',
+                      (await getTemporaryDirectory()).path,
+                      '${DateTime.now()}.png',
                     );
 
                     // Attempt to take a picture and log where it's been saved.
                     await _controllers[_currentController].takePicture(path);
+                    await GallerySaver.saveImage(path, albumName: 'capsul');
 
                     // If the picture was taken, display it on a new screen.
                   } catch (e) {
@@ -119,6 +134,9 @@ class ViewFinderState extends State<ViewFinder> {
                   }
                 },
               ),
+              FlatButton(
+                child: Image.file(thumbnail)
+              )
             ],
           )
         )
