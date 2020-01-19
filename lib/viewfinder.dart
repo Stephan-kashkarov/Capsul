@@ -55,7 +55,9 @@ class _ViewFinderState extends State<ViewFinder> {
       ),
       CameraController(
         // Get a specific camera from the list of available cameras.
-        widget.cameras[1],
+        (widget.cameras.length > 1)
+        ? widget.cameras[1]
+        : widget.cameras[0],
         // Define the resolution to use.
         ResolutionPreset.ultraHigh,
       )
@@ -75,6 +77,7 @@ class _ViewFinderState extends State<ViewFinder> {
 
   @override
   Widget build(BuildContext context) {
+    print(thumbnail);
     return Column(
       children: <Widget>[
         FutureBuilder<void>(
@@ -130,7 +133,9 @@ class _ViewFinderState extends State<ViewFinder> {
                 },
               ),
               FlatButton(
-                child: Image.file(File(thumbnail)),
+                child: (thumbnail != null)
+                  ? Image.file(File(thumbnail))
+                  : Icon(Icons.camera_roll),
                 onPressed: () => Navigator.pushNamed(context, '/gallery'),
               )
             ],

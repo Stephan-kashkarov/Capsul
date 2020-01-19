@@ -1,8 +1,10 @@
 import 'dart:async';
-import 'dart:ffi';
 import 'package:camera/camera.dart';
+import 'package:capsul/gallery.dart';
 import 'package:flutter/material.dart';
+import 'gallery.dart';
 import 'viewfinder.dart';
+import 'settings.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,9 +17,9 @@ Future<void> main() async {
       theme: ThemeData.dark(),
       initialRoute: "/viewfinder",
       routes: {
-        '/viewfinder': ViewFinder(cameras: cameras),
-        '/gallery': Void,
-        '/settings': Void
+        '/viewfinder': (context) => ViewFinder(cameras: cameras),
+        '/gallery': (context) => Gallery(),
+        '/settings': (context) => Settings(),
       },
     )
   );
