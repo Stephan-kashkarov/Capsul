@@ -77,71 +77,78 @@ class _ViewFinderState extends State<ViewFinder> {
 
   @override
   Widget build(BuildContext context) {
-    print(thumbnail);
-    return Column(
-      children: <Widget>[
-        FutureBuilder<void>(
-          future: _initializeControllerFuture,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              // If the Future is complete, display the preview.
-              return CameraPreview(_controllers[_currentController]);
-            } else {
-              // Otherwise, display a loading indicator.
-              return Center(child: CircularProgressIndicator());
-            }
-          },
-        ),
-        Container(
-          child: ButtonBar(
-            children: <Widget>[
-              IconButton(
-                icon: Icon(_cameraIcon),
-                onPressed: () async {
-                  setState(() {
-                    _currentController = 1 - _currentController;
-                    initCamera();
-                  });
-                },
-              ),
-              IconButton(
-                icon: Icon(Icons.camera_alt),
-                onPressed: () async {
-                  try {
-                    // Ensure that the camera is initialized.
-                    await _initializeControllerFuture;
-
-                    // Construct the path where the image should be saved using the
-                    // pattern package.
-                    final path = join(
-                      // Store the picture in the temp directory.
-                      // Find the temp directory using the `path_provider` plugin.
-                      (await getTemporaryDirectory()).path,
-                      '${DateTime.now()}.png',
-                    );
-
-                    // Attempt to take a picture and log where it's been saved.
-                    await _controllers[_currentController].takePicture(path);
+    return Scaffold(
+      body: Column(
+        children: <Widget>[
+          Container(
+            height: MediaQuery.of(context).size.height * 0.90,
+            child: FutureBuilder<void>(
+              future: _initializeControllerFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  // If the Future is complete, display the preview.
+                  return CameraPreview(_controllers[_currentController]);
+                } else {
+                  // Otherwise, display a loading indicator.
+                  return Center(child: CircularProgressIndicator());
+                }
+              },
+            ),
+          ),
+          Container(
+            height: MediaQuery.of(context).size.height * 0.10,
+            child: ButtonBar(
+              buttonPadding: EdgeInsets.all(12.0),
+              alignment: MainAxisAlignment.center,
+              children: <Widget>[
+                FlatButton(
+                  child: Icon(_cameraIcon),
+                  onPressed: () async {
                     setState(() {
-                      thumbnail = path;
+                      _currentController = 1 - _currentController;
+                      initCamera();
                     });
-                    // If the picture was taken, display it on a new screen.
-                  } catch (e) {
-                    // If an error occurs, log the error to the console.
-                    print(e);
-                  }
-                },
-              ),
-              FlatButton(
-                child: (thumbnail != null)
-                  ? Image.file(File(thumbnail))
-                  : Icon(Icons.camera_roll),
-                onPressed: () => Navigator.pushNamed(context, '/gallery'),
-              )
-            ],
+                  },
+                ),
+                FlatButton(
+                  child: Icon(Icons.camera_alt),
+                  onPressed: () async {
+                    try {
+                      // Ensure that the camera is initialized.
+                      await _initializeControllerFuture;
+
+                      // Construct the path where the image should be saved using the
+                      // pattern package.
+                      final path = join(
+                        // Store the picture in the temp directory.
+                        // Find the temp directory using the `path_provider` plugin.
+                        (await getTemporaryDirectory()).path,
+                        '${DateTime.now()}.png',
+                      );
+
+                      // Attempt to take a picture and log where it's been saved.
+                      await _controllers[_currentController].takePicture(path);
+                      setState(() {
+                        thumbnail = path;
+                      });
+                      // If the picture was taken, display it on a new screen.
+                    } catch (e) {
+                      // If an error occurs, log the error to the console.
+                      print(e);
+                    }
+                  },
+                ),
+                FlatButton(
+                  child: (thumbnail != null)
+                    ? Image.file(File(thumbnail))
+                    : Icon(Icons.camera_roll),
+                  onPressed: () => Navigator.pushNamed(context, '/gallery'),
+                )
+              ],
+            )
           )
-        )
-      ],
+        ],
+      )
     );
   }
 }
