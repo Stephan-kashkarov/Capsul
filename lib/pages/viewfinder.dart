@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:io';
+import '../database/models.dart';
+import '../database/server.dart';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +14,7 @@ class ViewFinder extends StatefulWidget {
 
   const ViewFinder({
     Key key,
+    @required PhotoServer db,
     @required this.cameras,
   }) : super(key: key);
 
@@ -25,7 +28,6 @@ class _ViewFinderState extends State<ViewFinder> {
   int _currentController;
   IconData _cameraIcon;
   String thumbnail;
-  List<List<String>> gallery;
 
   void initCamera() {
     /*
@@ -64,7 +66,6 @@ class _ViewFinderState extends State<ViewFinder> {
       )
     ];
     _currentController = 0;
-    gallery = [[],[]];
 
     // Next, initialize the controller. This returns a Future.
     initCamera();
@@ -133,10 +134,12 @@ class _ViewFinderState extends State<ViewFinder> {
                       print("Snap!");
                       setState(() {
                         thumbnail = path;
-                        print(1);
-                        print(gallery);
-                        gallery[0].add(path);
-                        print(2);
+                        Photo photo = Photo(
+                          MemoryImage(File(path).readAsBytesSync()),
+                          "none",
+                          DateTime.now().add(new Duration(minutes: 20))
+                        );
+                        widget.db.add(photo);
                       });
                       // If the picture was taken, display it on a new screen.
                     } catch (e) {
@@ -149,7 +152,7 @@ class _ViewFinderState extends State<ViewFinder> {
                   child: (thumbnail != null)
                     ? Image.file(File(thumbnail))
                     : Icon(Icons.camera_roll),
-                  onPressed: () => Navigator.pushNamed(context, '/gallery', arguments: {gallery: gallery}),
+                  onPressed: () => Navigator.pushNamed(context, '/gallery'),
                 )
               ],
             )

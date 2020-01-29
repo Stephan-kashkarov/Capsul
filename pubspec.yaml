@@ -22,6 +22,7 @@ dependencies:
   camera:
   gallery_saver:
   sqflite: ^1.2.0
+  intl:
   # path_provider:
   # path:
 

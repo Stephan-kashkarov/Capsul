@@ -35,7 +35,7 @@ class DatabaseFactory {
     await db.execute('''
     CREATE TABLE photos
     (
-      id INTEGER PRIMARY KEY,
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
       image BLOB,
       filter TEXT,
       targetTime TEXT,

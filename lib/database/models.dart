@@ -1,19 +1,34 @@
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
+
 
 class Photo {
   int id;
-  Image image;
+  MemoryImage image;
   String filter;
   DateTime targetTime;
   bool isCompleted;
 
-  Photo(this.id, this.image, this.filter, this.targetTime);
+  DateFormat format = DateFormat("dd-MM-yyyy HH:mm:ss");
+
+  Photo(this.image, this.filter, this.targetTime);
 
   Photo.fromJson(Map<String, dynamic> json) {
     this.id = json['id'];
-    this.image = Image.memory(json['image']);
+    this.image = MemoryImage(json['image']);
     this.filter = json['filter'];
     this.targetTime = DateTime.parse(json['targetTime']);
     this.isCompleted = json['isCompleted'] == 1;
+  }
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {
+      'id': this.id,
+      'image': this.image.bytes,
+      'filter': this.filter,
+      'targetTime': format.format(this.targetTime),
+      'isCompleted': (this.isCompleted) ? 1 : 0,
+    };
+    return json;
   }
 }
