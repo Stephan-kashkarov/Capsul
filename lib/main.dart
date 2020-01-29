@@ -9,16 +9,22 @@ import 'database/models.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await DatabaseFactory().initDatabase();
   final allCameras = await availableCameras();
-  final List<CameraDescription> cameras = allCameras.sublist(0, 2);
+  final List<CameraDescription> cameras = [];
+  if (allCameras.length > 1) {
+    cameras.addAll(allCameras.sublist(0, 2));
+  } else {
+    cameras.add(allCameras.first);
+  }
 
   runApp(
     MaterialApp(
       theme: ThemeData.dark(),
       initialRoute: "/viewfinder",
       routes: {
-        '/viewfinder': (context) => ViewFinder(db: server, cameras: cameras),
-        '/gallery': (context) => Gallery(db: server),
+        '/viewfinder': (context) => ViewFinder(cameras: cameras),
+        '/gallery': (context) => Gallery(),
         '/settings': (context) => Settings(),
       },
     )

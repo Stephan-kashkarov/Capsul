@@ -27,7 +27,7 @@ class Photo {
       'image': this.image.bytes,
       'filter': this.filter,
       'targetTime': format.format(this.targetTime),
-      'isCompleted': (this.isCompleted) ? 1 : 0,
+      'isCompleted': (this.isCompleted == true) ? 1 : 0,
     };
     return json;
   }

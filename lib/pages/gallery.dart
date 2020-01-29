@@ -1,5 +1,8 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import '../database/server.dart';
+import '../database/models.dart';
 
 class ShowImageArugments {
   final String filepath;
@@ -16,9 +19,15 @@ class Gallery extends StatefulWidget {
 
 class _GalleryState extends State<Gallery> {
 
+  List<Photo> getPhotos() {
+    List<Photo> returnVal = [];
+    PhotoServer.getAll().then((photos) => returnVal.addAll(photos));
+    return returnVal;
+  }
+
   @override
   Widget build(BuildContext context) {
-    List images;
+    List<Photo> images = getPhotos();
     return Scaffold(
       appBar: AppBar(
         title: Text("Gallery")
@@ -32,7 +41,7 @@ class _GalleryState extends State<Gallery> {
         itemBuilder: (BuildContext context, int index) {
           return GridTile(
             child: GestureDetector(
-              child: Image.file(File(images[index])),
+              child: Image.memory(images[index].image.bytes),
               onTap: () async {
                 Navigator.pushNamed(
                   context, '/showImage',

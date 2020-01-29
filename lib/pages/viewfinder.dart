@@ -14,7 +14,6 @@ class ViewFinder extends StatefulWidget {
 
   const ViewFinder({
     Key key,
-    @required PhotoServer db,
     @required this.cameras,
   }) : super(key: key);
 
@@ -47,27 +46,18 @@ class _ViewFinderState extends State<ViewFinder> {
   @override
   void initState() {
     super.initState();
-    // To display the current output from the Camera,
-    // create a CameraController.
     _controllers = [
+      CameraController(widget.cameras[0], ResolutionPreset.ultraHigh),
       CameraController(
-        // Get a specific camera from the list of available cameras.
-        widget.cameras[0],
-        // Define the resolution to use.
-        ResolutionPreset.ultraHigh,
-      ),
-      CameraController(
-        // Get a specific camera from the list of available cameras.
+        // Get second camera if its an option
         (widget.cameras.length > 1)
         ? widget.cameras[1]
         : widget.cameras[0],
-        // Define the resolution to use.
         ResolutionPreset.ultraHigh,
       )
     ];
     _currentController = 0;
 
-    // Next, initialize the controller. This returns a Future.
     initCamera();
   }
 
@@ -139,7 +129,7 @@ class _ViewFinderState extends State<ViewFinder> {
                           "none",
                           DateTime.now().add(new Duration(minutes: 20))
                         );
-                        widget.db.add(photo);
+                        PhotoServer.insert(photo);
                       });
                       // If the picture was taken, display it on a new screen.
                     } catch (e) {
