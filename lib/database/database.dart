@@ -33,12 +33,11 @@ class DatabaseFactory {
 
   Future<void> createImageTable(Database db) async {
     await db.execute('''
-    CREATE TABLE images
+    CREATE TABLE photos
     (
       id INTEGER PRIMARY KEY,
       image BLOB,
       filter TEXT,
-      created TEXT,
       targetTime TEXT,
       isCompleted BIT NOT NULL
     )''');

@@ -10,22 +10,15 @@ class ShowImageArugments {
 }
 
 class Gallery extends StatefulWidget {
-  final List<List<String>> gallery;
-  
-  const Gallery({
-    Key key,
-    @required this.gallery,
-  }) : super(key : key);
-
   @override
   _GalleryState createState() => _GalleryState();
 }
 
 class _GalleryState extends State<Gallery> {
-  int album;
 
   @override
   Widget build(BuildContext context) {
+    List images;
     return Scaffold(
       appBar: AppBar(
         title: Text("Gallery")
@@ -35,16 +28,16 @@ class _GalleryState extends State<Gallery> {
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 5,
         ),
-        itemCount: widget.gallery[album].length,
+        itemCount: images.length,
         itemBuilder: (BuildContext context, int index) {
           return GridTile(
             child: GestureDetector(
-              child: Image.file(File(widget.gallery[album][index])),
+              child: Image.file(File(images[index])),
               onTap: () async {
                 Navigator.pushNamed(
                   context, '/showImage',
                   arguments: {
-                    'filepath': widget.gallery[album][index]
+                    'filepath': images[index]
                   }
                 );
               }
