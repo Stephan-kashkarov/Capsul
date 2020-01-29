@@ -25,6 +25,7 @@ class _ViewFinderState extends State<ViewFinder> {
   int _currentController;
   IconData _cameraIcon;
   String thumbnail;
+  List<List<String>> gallery;
 
   void initCamera() {
     /*
@@ -63,6 +64,7 @@ class _ViewFinderState extends State<ViewFinder> {
       )
     ];
     _currentController = 0;
+    gallery = [[],[]];
 
     // Next, initialize the controller. This returns a Future.
     initCamera();
@@ -128,8 +130,13 @@ class _ViewFinderState extends State<ViewFinder> {
 
                       // Attempt to take a picture and log where it's been saved.
                       await _controllers[_currentController].takePicture(path);
+                      print("Snap!");
                       setState(() {
                         thumbnail = path;
+                        print(1);
+                        print(gallery);
+                        gallery[0].add(path);
+                        print(2);
                       });
                       // If the picture was taken, display it on a new screen.
                     } catch (e) {
@@ -142,7 +149,7 @@ class _ViewFinderState extends State<ViewFinder> {
                   child: (thumbnail != null)
                     ? Image.file(File(thumbnail))
                     : Icon(Icons.camera_roll),
-                  onPressed: () => Navigator.pushNamed(context, '/gallery'),
+                  onPressed: () => Navigator.pushNamed(context, '/gallery', arguments: {gallery: gallery}),
                 )
               ],
             )

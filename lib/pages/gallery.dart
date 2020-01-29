@@ -29,6 +29,7 @@ class _GalleryState extends State<Gallery> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Gallery")
+        
       ),
       body: GridView.builder(
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(

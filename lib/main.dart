@@ -1,16 +1,14 @@
 import 'dart:async';
 import 'package:camera/camera.dart';
-import 'package:capsul/gallery.dart';
 import 'package:flutter/material.dart';
-import 'gallery.dart';
-import 'viewfinder.dart';
-import 'settings.dart';
+import 'pages/gallery.dart';
+import 'pages/viewfinder.dart';
+import 'pages/settings.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final c = await availableCameras();
-  print(c);
-  final List<CameraDescription> cameras = c.sublist(0, 1);
+  final allCameras = await availableCameras();
+  final List<CameraDescription> cameras = allCameras.sublist(0, 2);
 
   runApp(
     MaterialApp(
@@ -23,5 +21,4 @@ Future<void> main() async {
       },
     )
   );
-
 }
