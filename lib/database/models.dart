@@ -9,7 +9,7 @@ class Photo {
   DateTime targetTime;
   bool isCompleted;
 
-  DateFormat format = DateFormat("dd-MM-yyyy HH:mm:ss");
+  DateFormat format = DateFormat("yyyy-MM-dd HH:mm:ss");
 
   Photo(this.image, this.filter, this.targetTime);
 

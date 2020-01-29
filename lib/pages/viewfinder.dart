@@ -47,7 +47,7 @@ class _ViewFinderState extends State<ViewFinder> {
   void initState() {
     super.initState();
     _controllers = [
-      CameraController(widget.cameras[0], ResolutionPreset.ultraHigh),
+      CameraController(widget.cameras[0], ResolutionPreset.low),
       CameraController(
         // Get second camera if its an option
         (widget.cameras.length > 1)
