@@ -25,9 +25,9 @@ class DatabaseFactory {
     print("""
     ---+++### Database Log ###+++---
     Function: $functionName,
-    Query: $sql,
     Params: ${(params != null) ? params : 'N/A'}
     Result: ${(result != null) ? result : 'N/A'}
+    Query: $sql,
     """);
   }
 

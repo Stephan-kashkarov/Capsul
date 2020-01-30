@@ -7,7 +7,7 @@ class Photo {
   MemoryImage image;
   String filter;
   DateTime targetTime;
-  bool isCompleted;
+  bool isCompleted = false;
 
   DateFormat format = DateFormat("yyyy-MM-dd HH:mm:ss");
 

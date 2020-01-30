@@ -23,8 +23,7 @@ dependencies:
   gallery_saver:
   sqflite: ^1.2.0
   intl:
-  # path_provider:
-  # path:
+  background_fetch: '^0.2.0'
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

@@ -1,10 +1,13 @@
 import 'dart:async';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:background_fetch/background_fetch.dart';
+
 import 'pages/gallery.dart';
 import 'pages/viewfinder.dart';
 import 'pages/settings.dart';
 import 'database/database.dart';
+import 'services/background.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,4 +31,6 @@ Future<void> main() async {
       },
     )
   );
+
+  BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
 }
