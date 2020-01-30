@@ -37,12 +37,13 @@ class _GalleryState extends State<Gallery> {
             var photos = snapshot.data;
             return GridView.builder(
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 5,
+                crossAxisCount: 4,
               ),
               itemCount: photos.length,
               itemBuilder: (BuildContext context, int index) {
-                print(photos[index].id);
-                return GridTile(
+                dynamic photo;
+                if (photos[index].isCompleted) {
+                  return GridTile(
                   child: GestureDetector(
                     child: Image.memory(photos[index].image.bytes),
                     onTap: () async {
@@ -55,6 +56,9 @@ class _GalleryState extends State<Gallery> {
                     }
                   ),
                 );
+                } else {
+                  return GridTile(child: Icon(Icons.timer),);
+                }
               },
             );
           } else {

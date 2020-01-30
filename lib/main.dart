@@ -12,6 +12,7 @@ import 'services/background.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await DatabaseFactory().initDatabase();
+  await initBackgroundState();
   final allCameras = await availableCameras();
   final List<CameraDescription> cameras = [];
   if (allCameras.length > 1) {
