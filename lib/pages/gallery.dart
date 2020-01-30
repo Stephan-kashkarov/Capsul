@@ -41,7 +41,6 @@ class _GalleryState extends State<Gallery> {
               ),
               itemCount: photos.length,
               itemBuilder: (BuildContext context, int index) {
-                dynamic photo;
                 if (photos[index].isCompleted) {
                   return GridTile(
                   child: GestureDetector(
