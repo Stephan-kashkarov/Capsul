@@ -1,5 +1,3 @@
-import 'dart:io';
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import '../database/server.dart';
 import '../database/models.dart';
@@ -18,41 +16,51 @@ class Gallery extends StatefulWidget {
 }
 
 class _GalleryState extends State<Gallery> {
-
-  List<Photo> getPhotos() {
-    List<Photo> returnVal = [];
-    PhotoServer.getAll().then((photos) => returnVal.addAll(photos));
-    return returnVal;
+  Future<List<Photo>> images;
+  @override
+  void initState() {
+    super.initState();
+    images = PhotoServer.getAll();
   }
 
   @override
   Widget build(BuildContext context) {
-    List<Photo> images = getPhotos();
     return Scaffold(
       appBar: AppBar(
         title: Text("Gallery")
         
       ),
-      body: GridView.builder(
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 5,
-        ),
-        itemCount: images.length,
-        itemBuilder: (BuildContext context, int index) {
-          return GridTile(
-            child: GestureDetector(
-              child: Image.memory(images[index].image.bytes),
-              onTap: () async {
-                Navigator.pushNamed(
-                  context, '/showImage',
-                  arguments: {
-                    'filepath': images[index]
-                  }
+      body: FutureBuilder(
+        future: images,
+        builder: (context, snapshot) {
+          if (snapshot.hasData){
+            var photos = snapshot.data;
+            return GridView.builder(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 5,
+              ),
+              itemCount: photos.length,
+              itemBuilder: (BuildContext context, int index) {
+                print(photos[index].id);
+                return GridTile(
+                  child: GestureDetector(
+                    child: Image.memory(photos[index].image.bytes),
+                    onTap: () async {
+                      Navigator.pushNamed(
+                        context, '/showImage',
+                        arguments: {
+                          'filepath': photos[index]
+                        }
+                      );
+                    }
+                  ),
                 );
-              }
-            ),
-          );
-        },
+              },
+            );
+          } else {
+            return Center(child: CircularProgressIndicator());
+          }
+        }
       )
     );
   }

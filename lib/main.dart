@@ -5,7 +5,6 @@ import 'pages/gallery.dart';
 import 'pages/viewfinder.dart';
 import 'pages/settings.dart';
 import 'database/database.dart';
-import 'database/models.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
