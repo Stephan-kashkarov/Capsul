@@ -11,10 +11,16 @@ import 'services/background.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // initalises database
   await DatabaseFactory().initDatabase();
+  // Processes Background task config
   await initBackgroundState();
+  // Gets list of cameras
   final allCameras = await availableCameras();
   final List<CameraDescription> cameras = [];
+
+  // Selects one or two cameras
   if (allCameras.length > 1) {
     cameras.addAll(allCameras.sublist(0, 2));
   } else {
@@ -33,5 +39,6 @@ Future<void> main() async {
     )
   );
 
+  // launches headless task
   BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
 }

@@ -1,12 +1,13 @@
 import 'dart:async';
 import 'dart:io';
-import '../database/models.dart';
-import '../database/server.dart';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' show join;
 import 'package:path_provider/path_provider.dart';
+
+import '../database/models.dart';
+import '../database/server.dart';
 
 // A screen that allows users to take a picture using a given camera.
 class ViewFinder extends StatefulWidget {
@@ -113,8 +114,6 @@ class _ViewFinderState extends State<ViewFinder> {
                       // Construct the path where the image should be saved using the
                       // pattern package.
                       final path = join(
-                        // Store the picture in the temp directory.
-                        // Find the temp directory using the `path_provider` plugin.
                         (await getTemporaryDirectory()).path,
                         '${DateTime.now()}.png',
                       );
@@ -131,9 +130,7 @@ class _ViewFinderState extends State<ViewFinder> {
                         );
                         PhotoServer.insert(photo);
                       });
-                      // If the picture was taken, display it on a new screen.
                     } catch (e) {
-                      // If an error occurs, log the error to the console.
                       print(e);
                     }
                   },
