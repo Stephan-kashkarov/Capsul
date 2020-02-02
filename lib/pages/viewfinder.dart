@@ -22,12 +22,29 @@ class ViewFinder extends StatefulWidget {
   _ViewFinderState createState() => _ViewFinderState();
 }
 
-class _ViewFinderState extends State<ViewFinder> {
+class _ViewFinderState extends State<ViewFinder> with TickerProviderStateMixin {
   List<CameraController> _controllers;
   Future<void> _initializeControllerFuture;
   int _currentController;
   IconData _cameraIcon;
-  String thumbnail;
+  double _bottomBarHeight = 50.0;
+  bool _sliderVisible = false;
+  bool _filtersVisible = false;
+  List<Duration> _sliderDurations = [
+    Duration(minutes: 30),
+    Duration(days: 1),
+    Duration(days: 30),
+    Duration(days: 182),
+    Duration(days: 365),
+  ];
+  List<String> _sliderValues = [
+    "30 mins",
+    "1 day",
+    "30 day",
+    "6 months",
+    "1 year",
+  ];
+  double _sliderIndex = 0;
 
   void initCamera() {
     /*
@@ -85,11 +102,10 @@ class _ViewFinderState extends State<ViewFinder> {
       await _controllers[_currentController].takePicture(path);
       print("Snap!");
       setState(() {
-        thumbnail = path;
         Photo photo = Photo(
           MemoryImage(File(path).readAsBytesSync()),
           "none",
-          DateTime.now().add(new Duration(minutes: 20))
+          DateTime.now().add(_sliderDurations[_sliderIndex.round()])
         );
         PhotoServer.insert(photo);
       });
@@ -111,6 +127,7 @@ class _ViewFinderState extends State<ViewFinder> {
       // Top app bar with flash and switch cameras
       extendBodyBehindAppBar: true,
       appBar: AppBar(
+        toolbarOpacity: 0.0,
         backgroundColor: Color(0x00ffffff),
         leading: IconButton(
           icon: Icon(Icons.flash_auto),
@@ -136,28 +153,95 @@ class _ViewFinderState extends State<ViewFinder> {
         color: Color(0x70505050),
         shape: CircularNotchedRectangle(),
         notchMargin: 6.0,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            IconButton(
-              icon: Icon(Icons.settings),
-              iconSize: 30.0,
-              onPressed: () => Navigator.pushNamed(context, '/settings'),
-            ),
-            IconButton(
-              icon: Icon(Icons.av_timer),
-              onPressed: () {},
-            ),
-            IconButton(
-              icon: Icon(Icons.filter_b_and_w),
-              onPressed: () {},
-            ),
-            IconButton(
-              icon: Icon(Icons.filter),
-              iconSize: 30.0,
-              onPressed: () => Navigator.pushNamed(context, '/gallery'),
-            ),
-          ]
+        child: AnimatedSize(
+          curve: Curves.fastOutSlowIn,
+          duration: Duration(milliseconds: 500),
+          vsync: this,
+          child: Container(
+            height: _bottomBarHeight,
+            child: Column(
+              children: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    IconButton(
+                      icon: Icon(Icons.settings),
+                      iconSize: 30.0,
+                      onPressed: () => Navigator.pushNamed(context, '/settings'),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.av_timer),
+                      onPressed: () {
+                        setState(() {
+                          if (_bottomBarHeight == 120.0) {
+                            _bottomBarHeight = 50.0;
+                            _sliderVisible = false;
+                          } else {
+                            _bottomBarHeight = 120.0;
+                            _sliderVisible = true;
+                            _filtersVisible = false;
+                          }
+                        });
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.filter_b_and_w),
+                      onPressed: () {
+                        setState(() {
+                          if (_bottomBarHeight == 120.0) {
+                            _bottomBarHeight = 50.0;
+                            _filtersVisible = false;
+                          } else {
+                            _bottomBarHeight = 120.0;
+                            _filtersVisible = true;
+                            _sliderVisible = false;
+                          }
+                        });
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.filter),
+                      iconSize: 30.0,
+                      onPressed: () => Navigator.pushNamed(context, '/gallery'),
+                    ),
+                  ]
+                ),
+                // Timer slider
+                Visibility(
+                  visible: _sliderVisible,
+                  maintainState: false,
+                  child: Slider(
+                    value: _sliderIndex,
+                    onChanged: (newVal) => setState(() => _sliderIndex = newVal),
+                    label: "${_sliderValues[_sliderIndex.round()]}",
+                    divisions: _sliderValues.length - 1,
+                    min: 0,
+                    max: 4
+                  ),
+                ),
+                // Filters
+                Visibility(
+                  visible: _filtersVisible,
+                  maintainState: false,
+                  child: Container(
+                    width: 50.0,
+                    height: 50.0,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: 10,
+                      itemBuilder: (context, int) {
+                        return Container(
+                          width: 40.0,
+                          height: 40.0,
+                          color: Colors.black,
+                        );
+                      }
+                    ),
+                  ),
+                ),
+              ]
+            )
+          ),
         ),
       ),
       // Body
