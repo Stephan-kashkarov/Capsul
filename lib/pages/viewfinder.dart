@@ -69,83 +69,110 @@ class _ViewFinderState extends State<ViewFinder> {
     super.dispose();
   }
 
+  void takePhoto() async {
+    try {
+      // Ensure that the camera is initialized.
+      await _initializeControllerFuture;
+
+      // Construct the path where the image should be saved using the
+      // pattern package.
+      final path = join(
+        (await getTemporaryDirectory()).path,
+        '${DateTime.now()}.png',
+      );
+
+      // Attempt to take a picture and log where it's been saved.
+      await _controllers[_currentController].takePicture(path);
+      print("Snap!");
+      setState(() {
+        thumbnail = path;
+        Photo photo = Photo(
+          MemoryImage(File(path).readAsBytesSync()),
+          "none",
+          DateTime.now().add(new Duration(minutes: 20))
+        );
+        PhotoServer.insert(photo);
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  void flipCamera() async {
+    setState(() {
+      _currentController = 1 - _currentController;
+      initCamera();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: <Widget>[
-          Container(
-            height: MediaQuery.of(context).size.height * 0.90,
-            child: FutureBuilder<void>(
-              future: _initializeControllerFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  // If the Future is complete, display the preview.
-                  return CameraPreview(_controllers[_currentController]);
-                } else {
-                  // Otherwise, display a loading indicator.
-                  return Center(child: CircularProgressIndicator());
-                }
-              },
-            ),
-          ),
-          Container(
-            height: MediaQuery.of(context).size.height * 0.10,
-            child: ButtonBar(
-              buttonPadding: EdgeInsets.all(12.0),
-              alignment: MainAxisAlignment.center,
-              children: <Widget>[
-                FlatButton(
-                  child: Icon(_cameraIcon),
-                  onPressed: () async {
-                    setState(() {
-                      _currentController = 1 - _currentController;
-                      initCamera();
-                    });
-                  },
-                ),
-                FlatButton(
-                  child: Icon(Icons.camera_alt),
-                  onPressed: () async {
-                    try {
-                      // Ensure that the camera is initialized.
-                      await _initializeControllerFuture;
-
-                      // Construct the path where the image should be saved using the
-                      // pattern package.
-                      final path = join(
-                        (await getTemporaryDirectory()).path,
-                        '${DateTime.now()}.png',
-                      );
-
-                      // Attempt to take a picture and log where it's been saved.
-                      await _controllers[_currentController].takePicture(path);
-                      print("Snap!");
-                      setState(() {
-                        thumbnail = path;
-                        Photo photo = Photo(
-                          MemoryImage(File(path).readAsBytesSync()),
-                          "none",
-                          DateTime.now().add(new Duration(minutes: 20))
-                        );
-                        PhotoServer.insert(photo);
-                      });
-                    } catch (e) {
-                      print(e);
-                    }
-                  },
-                ),
-                FlatButton(
-                  child: (thumbnail != null)
-                    ? Image.file(File(thumbnail))
-                    : Icon(Icons.camera_roll),
-                  onPressed: () => Navigator.pushNamed(context, '/gallery'),
-                )
-              ],
-            )
+      // Top app bar with flash and switch cameras
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Color(0x00ffffff),
+        leading: IconButton(
+          icon: Icon(Icons.flash_auto),
+          onPressed: () {
+            return;
+          },
+        ),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(_cameraIcon),
+            onPressed: flipCamera,
           )
         ],
-      )
+      ),
+      // Bottom bar
+      extendBody: true,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.photo_camera),
+        onPressed: takePhoto
+      ),
+      bottomNavigationBar: BottomAppBar(
+        color: Color(0x70505050),
+        shape: CircularNotchedRectangle(),
+        notchMargin: 6.0,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            IconButton(
+              icon: Icon(Icons.settings),
+              iconSize: 30.0,
+              onPressed: () => Navigator.pushNamed(context, '/settings'),
+            ),
+            IconButton(
+              icon: Icon(Icons.av_timer),
+              onPressed: () {},
+            ),
+            IconButton(
+              icon: Icon(Icons.filter_b_and_w),
+              onPressed: () {},
+            ),
+            IconButton(
+              icon: Icon(Icons.filter),
+              iconSize: 30.0,
+              onPressed: () => Navigator.pushNamed(context, '/gallery'),
+            ),
+          ]
+        ),
+      ),
+      // Body
+      body: FutureBuilder<void>(
+        future: _initializeControllerFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            // If the Future is complete, display the preview.
+            return CameraPreview(_controllers[_currentController]);
+          } else {
+            // Otherwise, display a loading indicator.
+            return Center(child: CircularProgressIndicator());
+          }
+        },
+      ),
     );
   }
 }
