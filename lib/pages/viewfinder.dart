@@ -114,7 +114,7 @@ class _ViewFinderState extends State<ViewFinder> with TickerProviderStateMixin {
     }
   }
 
-  void flipCamera() async {
+  void flipCamera() {
     setState(() {
       _currentController = 1 - _currentController;
       initCamera();
