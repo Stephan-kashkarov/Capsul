@@ -7,6 +7,7 @@ class Photo {
   MemoryImage image;
   String filter;
   DateTime targetTime;
+  DateTime takenTime;
   bool isCompleted = false;
 
   DateFormat format = DateFormat("yyyy-MM-dd HH:mm:ss");
@@ -26,6 +27,7 @@ class Photo {
       'id': this.id,
       'image': this.image.bytes,
       'filter': this.filter,
+      'takenTime': format.format(this.takenTime),
       'targetTime': format.format(this.targetTime),
       'isCompleted': (this.isCompleted == true) ? 1 : 0,
     };

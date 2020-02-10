@@ -47,7 +47,7 @@ class PhotoServer {
         isCompleted
       )
       VALUES
-      (?,?,?,?,?)
+      (?,?,?,?)
       """;
     List<dynamic> params = [
       data['image'],

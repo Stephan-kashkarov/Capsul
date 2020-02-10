@@ -229,7 +229,7 @@ class _ViewFinderState extends State<ViewFinder> with TickerProviderStateMixin {
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
                       itemCount: 10,
-                      itemBuilder: (context, int) {
+                      itemBuilder: (context, i) {
                         return Container(
                           width: 40.0,
                           height: 40.0,
